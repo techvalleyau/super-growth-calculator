@@ -3,23 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO: Updated Title Tag with Keywords -->
     <title>AusSuperCalc.com.au | Australian Superannuation Growth Calculator & Retirement Planner</title>
+    <!-- SEO: Meta Description for Search Engine Snippets -->
     <meta name="description" content="Project your Australian superannuation balance, calculate future growth, and plan for retirement. Our free super calculator considers contributions, returns, and inflation for accurate forecasts for all Australian super funds.">
-
-     <link rel="preconnect" href="https://fonts.googleapis.com">
+    
+    <!-- Google Fonts: Montserrat for headings, Open Sans for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
     
     <link rel="stylesheet" href="style.css">
 
-    </head>
+    <!-- Optional: Google Analytics (GA4) - Paste your GA4 tag here if you set it up -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    -->
+</head>
 <body>
+    <!-- Ad Slot: Top Banner (e.g., 728x90 or responsive) -->
     <div class="ad-slot top-banner">
+        <!-- Google AdSense code will go here once approved -->
         <p>Top Ad Space (e.g., Leaderboard)</p>
     </div>
 
     <div class="container">
+        <!-- SEO: Main Heading (H1) - Clearly states purpose with keywords -->
         <h1>Australian Superannuation Growth Calculator</h1>
         <p>Use our free, independent tool to project your superannuation balance, considering your contributions, investment returns, and the impact of inflation. Start planning your secure retirement future in Australia today, **regardless of your super fund.**</p>
 
@@ -39,13 +54,14 @@
             <input type="number" id="annualSalary" value="70000" min="0" step="1000">
         </div>
 
+        <!-- Employer Contribution Rate label (dynamic, as per script.js) -->
         <div class="input-group">
             <label>Employer Contribution Rate (%): <span id="displaySGrate">12.0</span>% (dynamic) <span class="info-icon" title="The Superannuation Guarantee (SG) rate your employer is required to pay. This automatically adjusts based on ATO's schedule.">?</span></label>
             <small>Automatically adjusted based on the ATO's Superannuation Guarantee (SG) schedule.</small>
         </div>
 
         <div class="input-group">
-            <label for="extraContributions">Extra Annual Contributions (AUD): <span class="info-icon" title="Voluntary contributions you might make, either before-tax (concessional) or after-tax (non-concessional).">?</span></label>
+            <label for="extraContributions">Extra Annual Contributions (AUD): <span class="info-icon" title="Voluntary before-tax (concessional) or after-tax (non-concessional) contributions.">?</span></label>
             <input type="number" id="extraContributions" value="0" min="0" step="100">
             <small>Voluntary before-tax (concessional) or after-tax (non-concessional) contributions.</small>
         </div>
@@ -79,11 +95,14 @@
 
         <button id="calculateBtn">Calculate Super Growth</button>
 
+        <!-- Ad Slot: Mid-Content Ad (e.g., 300x250 or responsive) -->
         <div class="ad-slot mid-content-ad">
+            <!-- Google AdSense code will go here once approved -->
             <p>Middle Ad Space (e.g., Rectangle)</p>
         </div>
 
         <div class="results">
+            <!-- SEO: H2 for results section -->
             <h2>Projected Super Balance:</h2>
             <p>At Retirement Age (<span id="retirementAgeDisplay"></span>), your projected super balance will be approximately:</p>
             <h3>Nominal Value: <span id="nominalBalance">AUD $0.00</span></h3>
@@ -94,6 +113,7 @@
             </div>
         </div>
 
+        <!-- SEO: New FAQ Section for more content & keywords -->
         <div class="faq-section">
             <h2>Frequently Asked Questions About Superannuation in Australia</h2>
             <div class="faq-item">
@@ -121,15 +141,25 @@
                 <p class="faq-answer">No, AusSuperCalc.com.au is an **independent online tool** designed to help all Australians project their superannuation growth, **regardless of which super fund they are with.** We are not affiliated with AustralianSuper or any other specific superannuation fund. This calculator provides general estimates for anyone in the Australian superannuation system.</p>
             </div>
         </div>
+        <!-- End of FAQ Section -->
+
         <p class="disclaimer">
             <strong>Disclaimer:</strong> This calculator provides estimates for illustrative purposes only. It does not account for taxes on contributions, investment earnings, or withdrawals, nor does it factor in fees, specific super fund rules, or changes in legislation. It is not financial advice. Please consult a qualified financial advisor for personalized advice.
         </p>
     </div>
 
+    <!-- Ad Slot: Footer Banner (e.g., 728x90 or responsive) -->
     <div class="ad-slot footer-banner">
+        <!-- Google AdSense code will go here once approved -->
         <p>Bottom Ad Space (e.g., Leaderboard)</p>
     </div>
 
+    <!-- Footer for Privacy Policy link -->
+    <footer class="site-footer">
+        <p>&copy; 2025 AusSuperCalc.com.au. All rights reserved. | <a href="privacy.html">Privacy Policy</a></p>
+    </footer>
+
+    <!-- Chart.js for graphing -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>

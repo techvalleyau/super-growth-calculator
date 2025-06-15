@@ -263,3 +263,32 @@ button#calculateBtn:hover {
         padding: 10px; /* Keep padding inside input */
     }
 }
+
+/* New Footer Styling */
+.site-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #e0e9f1; /* Light blue/grey to match overall theme */
+    color: #555;
+    font-size: 0.9em;
+    border-top: 1px solid #c9d8e5;
+    border-radius: 0 0 8px 8px; /* Rounded bottom corners if container is rounded */
+}
+
+.site-footer a {
+    color: #0056b3; /* Match your primary blue for links */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.site-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Ensure padding on mobile for footer text if needed */
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 15px; /* Adjust padding for smaller screens */
+    }
+}
