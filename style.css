@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Open Sans', Arial, sans-serif; /* New font for body text */
     margin: 0;
     padding: 20px;
     background-color: #f4f7f6;
@@ -17,14 +17,16 @@ body {
 }
 
 h1, h2, h3 {
+    font-family: 'Montserrat', sans-serif; /* New font for headings */
     color: #0056b3;
     text-align: center;
     margin-bottom: 20px;
 }
 
+/* Updated P tag styling for justified text on desktop, and left-aligned on mobile */
 p {
     margin-bottom: 15px;
-    text-align: justify;
+    text-align: justify; /* Keep justified for larger screens */
 }
 
 .input-group {
@@ -235,15 +237,29 @@ button#calculateBtn:hover {
     padding: 10px 0;
 }
 
-/* Responsive adjustments for ads */
-@media (max-width: 768px) {
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) { /* Styles applied for screen widths up to 768px (common for tablets/mobile) */
     .ad-slot {
         min-height: 50px; /* Smaller height for mobile banners (e.g., 320x50) */
     }
-    .mid-content-ad {
-        /* On smaller screens, 300x250 might still fit, or let AdSense auto-size */
+    
+    /* Mobile-specific paragraph styling: left-align and add horizontal padding */
+    p {
+        text-align: left; /* Override justify for mobile */
+        padding: 0 15px; /* Add some padding to the sides */
     }
-    .top-banner, .footer-banner {
-        /* No specific changes here for mobile, let min-height handle it */
+
+    /* Ensure the introductory paragraph also gets padding */
+    .container > p:first-of-type {
+        padding: 0 15px;
+    }
+
+    .container {
+        padding: 20px 15px; /* Adjust general container padding for smaller screens */
+    }
+    .input-group input[type="number"],
+    .input-group select {
+        width: 100%; /* Full width for inputs on mobile, let padding from container handle spacing */
+        padding: 10px; /* Keep padding inside input */
     }
 }
