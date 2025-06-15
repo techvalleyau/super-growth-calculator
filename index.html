@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AusSuperCalc.com.au | Australian Superannuation Growth Calculator & Retirement Planner</title>
+    <meta name="description" content="Project your Australian superannuation balance, calculate future growth, and plan for retirement. Our free super calculator considers contributions, returns, and inflation for accurate forecasts.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Australian Superannuation Growth Calculator</h1>
+        <p>Use our free tool to project your superannuation balance, considering your contributions, investment returns, and the impact of inflation. Start planning your secure retirement future in Australia today.</p>
+
+        <div class="input-group">
+            <label for="currentAge">Your Current Age:</label>
+            <input type="number" id="currentAge" value="30" min="18" max="66" step="1">
+        </div>
+
+        <div class="input-group">
+            <label for="currentBalance">Current Super Balance (AUD):</label>
+            <input type="number" id="currentBalance" value="50000" min="0" step="1000">
+        </div>
+
+        <div class="input-group">
+            <label for="annualSalary">Current Annual Salary (AUD):</label>
+            <input type="number" id="annualSalary" value="70000" min="0" step="1000">
+        </div>
+
+        <div class="input-group">
+            <label>Employer Contribution Rate (%): <span id="displaySGrate">11.5</span>% (dynamic)</label>
+            <small>Automatically adjusted based on the ATO's Superannuation Guarantee (SG) schedule.</small>
+        </div>
+
+        <div class="input-group">
+            <label for="extraContributions">Extra Annual Contributions (AUD):</label>
+            <input type="number" id="extraContributions" value="0" min="0" step="100">
+            <small>Voluntary before-tax (concessional) or after-tax (non-concessional) contributions.</small>
+        </div>
+
+        <div class="input-group">
+            <label for="investmentReturn">Annual Investment Return (%):</label>
+            <input type="number" id="investmentReturn" value="7" min="0" max="20" step="0.1">
+            <small>Average long-term returns vary (e.g., 5-8% after fees).</small>
+        </div>
+
+        <div class="input-group">
+            <label for="inflationRateOption">Inflation Rate Assumption:</label>
+            <select id="inflationRateOption">
+                <option value="fixed" selected>Use Fixed Rate Below</option>
+                <option value="historical">Use Historical + Projected Rates</option>
+            </select>
+            <small>Choose between a consistent rate or a blend of historical and future projections.</small>
+        </div>
+
+        <div class="input-group" id="fixedInflationRateGroup">
+            <label for="inflationRate">Annual Inflation Rate (%):</label>
+            <input type="number" id="inflationRate" value="2.5" min="0" max="10" step="0.1">
+            <small>For real (purchasing power) calculations. RBA target is 2-3%.</small>
+        </div>
+
+        <div class="input-group">
+            <label for="retirementAge">Desired Retirement Age:</label>
+            <input type="number" id="retirementAge" value="67" min="18" max="90" step="1">
+            <small>Calculations will run until this age.</small>
+        </div>
+
+        <button id="calculateBtn">Calculate Super Growth</button>
+
+        <div class="results">
+            <h2>Projected Super Balance:</h2>
+            <p>At Retirement Age (<span id="retirementAgeDisplay"></span>), your projected super balance will be approximately:</p>
+            <h3>Nominal Value: <span id="nominalBalance">AUD $0.00</span></h3>
+            <h3>Real (Inflation-Adjusted) Value: <span id="realBalance">AUD $0.00</span></h3>
+
+            <div class="chart-container">
+                <canvas id="superChart"></canvas>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2>Frequently Asked Questions About Superannuation in Australia</h2>
+            <div class="faq-item">
+                <h3>What is Superannuation (Super)?</h3>
+                <p>Superannuation, or 'super', is a system in Australia where money is saved for your retirement. Your employer generally has to pay a percentage of your earnings (called the Superannuation Guarantee) into a super fund for you. These savings are invested and grow over time.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How is the Superannuation Guarantee (SG) calculated?</h3>
+                <p>The Superannuation Guarantee (SG) is the minimum amount your employer must pay into your super fund. It's calculated as a percentage of your ordinary time earnings (OTE), up to a maximum contribution base. The rate is set by the Australian government and increases periodically, reaching 12% by 1 July 2025.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Why is inflation important for my super forecast?</h3>
+                <p>Inflation erodes the purchasing power of money over time. While your nominal super balance might grow significantly, its 'real' value (what it can actually buy) will be less if inflation is high. Our superannuation calculator helps you see both the nominal and inflation-adjusted projected balance, giving you a more realistic view of your future financial power.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Can I make extra contributions to my super?</h3>
+                <p>Yes, you can make additional contributions to your superannuation on top of what your employer pays. These can be 'concessional' (before-tax) or 'non-concessional' (after-tax) contributions. Making extra contributions can significantly boost your super balance over the long term due to the power of compounding. Always check current contribution caps.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How does this calculator estimate my retirement balance?</h3>
+                <p>Our superannuation calculator projects your balance by taking your current super, salary, and additional contributions, then applying an estimated annual investment return over your remaining working years. It also factors in the changing Superannuation Guarantee rate and can adjust for inflation to give you a real-value projection. Note: It's an estimate and not financial advice.</p>
+            </div>
+        </div>
+        <p class="disclaimer">
+            <strong>Disclaimer:</strong> This calculator provides estimates for illustrative purposes only. It does not account for taxes on contributions, investment earnings, or withdrawals, nor does it factor in fees, specific super fund rules, or changes in legislation. It is not financial advice. Please consult a qualified financial advisor for personalized advice.
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
