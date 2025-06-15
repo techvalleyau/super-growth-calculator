@@ -1,280 +1,278 @@
+// --- Configuration Data ---
+const sgRates = [
+    { year: 2014, rate: 0.095 },
+    { year: 2015, rate: 0.095 },
+    { year: 2016, rate: 0.095 },
+    { year: 2017, rate: 0.095 },
+    { year: 2018, rate: 0.095 },
+    { year: 2019, rate: 0.095 },
+    { year: 2020, rate: 0.095 },
+    { year: 2021, rate: 0.100 }, // July 1, 2021 - June 30, 2022
+    { year: 2022, rate: 0.105 }, // July 1, 2022 - June 30, 2023
+    { year: 2023, rate: 0.110 }, // July 1, 2023 - June 30, 2024
+    { year: 2024, rate: 0.115 }, // July 1, 2024 - June 30, 2025
+    { year: 2025, rate: 0.120 }  // July 1, 2025 - June 30, 2026 onwards (reaches 12%)
+];
+
+// Max contribution base for SG (quarterly, indexed) - affects very high earners
+// ATO Indexed amounts: https://www.ato.gov.au/Super/Super-guarantee/Maximum-contribution-base/
+const maxContributionBaseQuarterly = [
+    { year: 2023, value: 62270 }, // FY 2023-24
+    { year: 2024, value: 64510 }, // FY 2024-25
+    { year: 2025, value: 66990 }  // FY 2025-26 - *Check ATO for actual updated amount if available post-June 2025*
+];
+
+const historicalInflationRates = [
+    // Source: RBA Inflation data (e.g., CPI annual percentage change)
+    // This is an example, you might want to find more precise annual rates or a longer series
+    { year: 1990, rate: 0.076 }, { year: 1991, rate: 0.029 }, { year: 1992, rate: 0.010 }, { year: 1993, rate: 0.018 }, { year: 1994, rate: 0.019 },
+    { year: 1995, rate: 0.046 }, { year: 1996, rate: 0.026 }, { year: 1997, rate: 0.011 }, { year: 1998, rate: 0.013 }, { year: 1999, rate: 0.017 },
+    { year: 2000, rate: 0.045 }, { year: 2001, rate: 0.032 }, { year: 2002, rate: 0.030 }, { year: 2003, rate: 0.027 }, { year: 2004, rate: 0.023 },
+    { year: 2005, rate: 0.028 }, { year: 2006, rate: 0.039 }, { year: 2007, rate: 0.036 }, { year: 2008, rate: 0.045 }, { year: 2009, rate: 0.018 },
+    { year: 2010, rate: 0.029 }, { year: 2011, rate: 0.033 }, { year: 2012, rate: 0.018 }, { year: 2013, rate: 0.024 }, { year: 2014, rate: 0.025 },
+    { year: 2015, rate: 0.015 }, { year: 2016, rate: 0.013 }, { year: 2017, rate: 0.021 }, { year: 2018, rate: 0.019 }, { year: 2019, rate: 0.018 },
+    { year: 2020, rate: 0.007 }, { year: 2021, rate: 0.035 }, { year: 2022, rate: 0.061 }, { year: 2023, rate: 0.041 } // Assuming up to end of 2023
+    // For future years, we project RBA target
+];
+const projectedInflationRate = 0.025; // RBA's target 2-3% midpoint for future projection
+
+// --- DOM Elements ---
+const calculateBtn = document.getElementById('calculateBtn');
+const inflationRateOption = document.getElementById('inflationRateOption');
+const fixedInflationRateGroup = document.getElementById('fixedInflationRateGroup');
+const displaySGrate = document.getElementById('displaySGrate'); // For dynamic SG rate display
+const superChartCanvas = document.getElementById('superChart');
+
+// --- Chart Instance (initialized globally) ---
+let superChart = null;
+
+// --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
-    const currentAgeInput = document.getElementById('currentAge');
-    const currentBalanceInput = document.getElementById('currentBalance');
-    const annualSalaryInput = document.getElementById('annualSalary');
-    const displaySGrate = document.getElementById('displaySGrate'); // New element
-    const extraContributionsInput = document.getElementById('extraContributions');
-    const investmentReturnInput = document.getElementById('investmentReturn');
-    const inflationRateOption = document.getElementById('inflationRateOption'); // New select
-    const inflationRateInput = document.getElementById('inflationRate');
-    const fixedInflationRateGroup = document.getElementById('fixedInflationRateGroup'); // New div
-    const retirementAgeInput = document.getElementById('retirementAge');
-    const calculateBtn = document.getElementById('calculateBtn');
+    // Set initial SG rate display
+    updateSGDisplay();
 
-    const retirementAgeDisplay = document.getElementById('retirementAgeDisplay');
-    const nominalBalanceDisplay = document.getElementById('nominalBalance');
-    const realBalanceDisplay = document.getElementById('realBalance');
-    const superChartCanvas = document.getElementById('superChart');
-
-    let superChart; // To hold our Chart.js instance
-
-    // --- Data for SG Rates and Inflation Rates ---
-
-    // ATO Superannuation Guarantee (SG) Schedule (from search results)
-    const sgRates = [
-        { year: 2023, rate: 0.110 }, // FY 2023-2024 (July 2023 - June 2024)
-        { year: 2024, rate: 0.115 }, // FY 2024-2025 (July 2024 - June 2025)
-        { year: 2025, rate: 0.120 }  // FY 2025-2026 and onwards (July 2025 - June 2026 onwards)
-    ];
-
-    // Maximum Super Contribution Base per quarter (for ordinary time earnings)
-    // This is indexed annually by AWOTE. We'll use recent/future published values.
-    // Assuming annual salary is divided by 4 for quarterly calculation check
-    const maxContributionBaseQuarterly = {
-        2023: 62270, // FY 2023-24
-        2024: 65070, // FY 2024-25
-        2025: 62500  // FY 2025-26
-    };
-
-
-    // Historical and Projected Australian Annual CPI (Inflation) Data (Year-ended March Quarter, from ABS/RBA)
-    // Using a blend of historical from ABS and future RBA targets/projections.
-    // Important: For a real app, you might want to fetch this daily/quarterly from a reliable, updated source.
-    // For this simple project, hardcoding recent and projecting future is a good starting point.
-    const inflationData = {
-        // Historical (Year-ended March Quarter CPI, source: ABS, RBA)
-        2015: 0.013,
-        2016: 0.013,
-        2017: 0.021,
-        2018: 0.019,
-        2019: 0.013,
-        2020: 0.022, // Pre-pandemic
-        2021: 0.011, // Pandemic low
-        2022: 0.051,
-        2023: 0.070,
-        2024: 0.036,
-        2025: 0.024, // Q1 2025 (latest available at query time is March 2025, 2.4%)
-
-        // Projections (simplified based on RBA targets/forecasts)
-        2026: 0.025, // RBA target mid-point
-        2027: 0.025,
-        2028: 0.025,
-        2029: 0.025,
-        2030: 0.025,
-        // ... and so on for future years ...
-        // For years beyond 2030, we'll use a default long-term projection if no specific data exists
-    };
-
-
-    // --- Helper Functions ---
-
-    function getCurrentFinancialYear(date) {
-        const year = date.getFullYear();
-        const month = date.getMonth(); // 0-indexed (0 = Jan, 6 = July)
-        return (month >= 6) ? year : year - 1; // July onwards is new FY
-    }
-
-    function getSGrateForYear(financialYear) {
-        // Find the rate for the given financial year
-        for (let i = sgRates.length - 1; i >= 0; i--) {
-            if (financialYear >= sgRates[i].year) {
-                return sgRates[i].rate;
-            }
-        }
-        // If year is before our earliest data, use the earliest rate
-        return sgRates[0].rate;
-    }
-
-    function getInflationRateForYear(year) {
-        if (inflationRateOption.value === 'fixed') {
-            return parseFloat(inflationRateInput.value) / 100;
-        } else { // 'historical' option
-            // Find the closest historical rate or use a projection
-            const historicalRate = inflationData[year];
-            if (historicalRate !== undefined) {
-                return historicalRate;
-            } else {
-                // If no specific historical data or projection, use a long-term average/target
-                return 0.025; // Default long-term RBA target
-            }
-        }
-    }
-
-    function calculateSuperGrowth() {
-        let currentAge = parseInt(currentAgeInput.value);
-        let currentBalance = parseFloat(currentBalanceInput.value);
-        const annualSalary = parseFloat(annualSalaryInput.value);
-        const extraContributions = parseFloat(extraContributionsInput.value);
-        const investmentReturnRate = parseFloat(investmentReturnInput.value) / 100;
-        const retirementAge = parseInt(retirementAgeInput.value);
-
-        if (currentAge >= retirementAge) {
-            alert('Your current age must be less than your desired retirement age.');
-            return;
-        }
-
-        const yearsToRetirement = retirementAge - currentAge;
-        const startFinancialYear = getCurrentFinancialYear(new Date());
-
-        let annualBalances = [];
-        let realBalances = [];
-        let years = [];
-        let currentCalculatedYear = currentAge; // To track age for chart labels
-
-        for (let yearCounter = 0; yearCounter <= yearsToRetirement; yearCounter++) {
-            const currentYear = startFinancialYear + yearCounter;
-            const ageAtEndOfYear = currentAge + yearCounter;
-
-            if (ageAtEndOfYear > retirementAge) break; // Stop at retirement age
-
-            years.push(`Age ${ageAtEndOfYear}`); // Label with age for clarity
-
-            // Get SG rate for the current financial year
-            const sgRate = getSGrateForYear(currentYear);
-            displaySGrate.textContent = (sgRate * 100).toFixed(1); // Update live display
-
-            // Calculate employer contributions, respecting maximum contribution base
-            const quarterlySalary = annualSalary / 4;
-            const maxBaseForYear = maxContributionBaseQuarterly[currentYear] || maxContributionBaseQuarterly[Object.keys(maxContributionBaseQuarterly).pop()]; // Use latest if future not defined
-            const effectiveQuarterlySalary = Math.min(quarterlySalary, maxBaseForYear);
-            const annualEmployerContribution = (effectiveQuarterlySalary * sgRate) * 4; // Multiply by 4 quarters
-
-            // Total annual contributions
-            const totalAnnualContributions = annualEmployerContribution + extraContributions;
-
-            // Apply contributions and investment returns
-            // For simplicity, we'll add contributions at the start of the year and apply full year return.
-            // In reality, super contributions are quarterly.
-            if (yearCounter > 0 || currentBalance === 0) { // Add contributions from year 1, or if starting balance is 0
-                 currentBalance += totalAnnualContributions;
-            }
-
-
-            currentBalance *= (1 + investmentReturnRate);
-
-            // Store nominal balance
-            annualBalances.push(currentBalance);
-
-            // Get inflation rate for the current year
-            const annualInflationRate = getInflationRateForYear(currentYear);
-
-            // Calculate real balance (inflation-adjusted to today's purchasing power)
-            // The real value is discounted by the cumulative inflation up to that year
-            const cumulativeInflationFactor = Math.pow((1 + annualInflationRate), yearCounter);
-            const realValue = currentBalance / cumulativeInflationFactor;
-            realBalances.push(realValue);
-        }
-
-        const finalNominalBalance = annualBalances[annualBalances.length - 1];
-        const finalRealBalance = realBalances[realBalances.length - 1];
-
-        retirementAgeDisplay.textContent = retirementAge;
-        nominalBalanceDisplay.textContent = formatCurrency(finalNominalBalance);
-        realBalanceDisplay.textContent = formatCurrency(finalRealBalance);
-
-        updateChart(years, annualBalances, realBalances);
-    }
-
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('en-AU', {
-            style: 'currency',
-            currency: 'AUD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(amount);
-    }
-
-    function updateChart(labels, nominalData, realData) {
-        if (superChart) {
-            superChart.destroy();
-        }
-
-        superChart = new Chart(superChartCanvas, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Nominal Balance (AUD)',
-                        data: nominalData,
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // For shaded area if fill: true
-                        tension: 0.1,
-                        fill: false
-                    },
-                    {
-                        label: 'Real Balance (AUD, Inflation Adjusted)',
-                        data: realData,
-                        borderColor: 'rgb(255, 99, 132)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        tension: 0.1,
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Super Balance (AUD)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return formatCurrency(value);
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Age'
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += formatCurrency(context.parsed.y);
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // --- Event Listeners and Initial Setup ---
-
-    // Toggle fixed inflation input visibility
+    // Show/hide fixed inflation rate input based on selection
     inflationRateOption.addEventListener('change', () => {
         if (inflationRateOption.value === 'fixed') {
             fixedInflationRateGroup.style.display = 'block';
         } else {
             fixedInflationRateGroup.style.display = 'none';
         }
-        calculateSuperGrowth(); // Recalculate when option changes
     });
 
-    // Recalculate on any input change
-    const inputs = document.querySelectorAll('.input-group input');
-    inputs.forEach(input => {
-        input.addEventListener('input', calculateSuperGrowth);
+    // UX: Attach event listener for calculate button
+    calculateBtn.addEventListener('click', calculateSuper);
+
+    // UX: Initialize FAQ toggles
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const answer = question.nextElementSibling;
+            const parentItem = question.closest('.faq-item'); // Get the parent for active class
+            
+            // Toggle active class on the question for styling (e.g., arrow change)
+            question.classList.toggle('active');
+
+            // Toggle show class for answer to control max-height/padding
+            answer.classList.toggle('show');
+
+            // Optional: Close other open FAQs if only one should be open at a time
+            // document.querySelectorAll('.faq-answer.show').forEach(openAnswer => {
+            //     if (openAnswer !== answer) {
+            //         openAnswer.classList.remove('show');
+            //         openAnswer.previousElementSibling.classList.remove('active');
+            //     }
+            // });
+        });
     });
-
-    calculateBtn.addEventListener('click', calculateSuperGrowth);
-
-    // Initial calculation on page load
-    calculateSuperGrowth();
 });
+
+// --- Helper Functions ---
+
+function updateSGDisplay() {
+    const currentYear = new Date().getFullYear();
+    const sg = sgRates.find(s => s.year === currentYear) || sgRates[sgRates.length - 1]; // Use latest if current year beyond defined
+    displaySGrate.textContent = (sg.rate * 100).toFixed(1);
+}
+
+function getSGRate(year) {
+    const sg = sgRates.find(s => s.year === year);
+    if (sg) {
+        return sg.rate;
+    }
+    // If year is beyond defined rates, use the last defined rate (currently 12%)
+    return sgRates[sgRates.length - 1].rate;
+}
+
+function getMaxContributionBase(year) {
+    const base = maxContributionBaseQuarterly.find(b => b.year === year);
+    if (base) {
+        return base.value * 4; // Convert quarterly to annual
+    }
+    // If year is beyond defined, use the last defined base (for estimation)
+    return maxContributionBaseQuarterly[maxContributionBaseQuarterly.length - 1].value * 4;
+}
+
+function getInflationRateForYear(year) {
+    if (inflationRateOption.value === 'fixed') {
+        return parseFloat(document.getElementById('inflationRate').value) / 100;
+    } else { // Historical + Projected
+        const historicalRate = historicalInflationRates.find(r => r.year === year);
+        if (historicalRate) {
+            return historicalRate.rate;
+        }
+        // For future years, use the projected rate
+        return projectedInflationRate;
+    }
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-AU', {
+        style: 'currency',
+        currency: 'AUD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+}
+
+// --- Main Calculation Logic ---
+function calculateSuper() {
+    // 1. Get Input Values
+    const currentAge = parseFloat(document.getElementById('currentAge').value);
+    let currentBalance = parseFloat(document.getElementById('currentBalance').value);
+    const annualSalary = parseFloat(document.getElementById('annualSalary').value);
+    const extraContributions = parseFloat(document.getElementById('extraContributions').value);
+    const investmentReturn = parseFloat(document.getElementById('investmentReturn').value) / 100;
+    const retirementAge = parseFloat(document.getElementById('retirementAge').value);
+    const currentYear = new Date().getFullYear();
+
+    // UX: Basic Input Validation
+    if (isNaN(currentAge) || currentAge < 18 || currentAge > 90 ||
+        isNaN(currentBalance) || currentBalance < 0 ||
+        isNaN(annualSalary) || annualSalary < 0 ||
+        isNaN(extraContributions) || extraContributions < 0 ||
+        isNaN(investmentReturn) || investmentReturn < 0 || investmentReturn > 1 || // Max 100%
+        isNaN(retirementAge) || retirementAge < currentAge || retirementAge > 90 ||
+        (inflationRateOption.value === 'fixed' && (isNaN(parseFloat(document.getElementById('inflationRate').value)) || parseFloat(document.getElementById('inflationRate').value) < 0))
+    ) {
+        alert("Please ensure all inputs are valid numbers. Monetary values cannot be negative, percentages should be realistic, and your retirement age must be greater than your current age.");
+        return; // Stop execution
+    }
+
+    // Update display for results section
+    document.getElementById('retirementAgeDisplay').textContent = retirementAge;
+
+    // 2. Prepare Data for Chart
+    const years = [];
+    const nominalBalances = [];
+    const realBalances = [];
+
+    let balance = currentBalance;
+    let realBalance = currentBalance; // Balance adjusted for inflation
+    let effectiveSalary = annualSalary; // Salary used for contributions, accounts for cap
+
+    // 3. Loop Through Years to Retirement
+    for (let age = currentAge; age <= retirementAge; age++) {
+        const yearIndex = currentYear + (age - currentAge);
+        years.push(yearIndex);
+
+        const sgRate = getSGRate(yearIndex);
+        const maxSGContributionBase = getMaxContributionBase(yearIndex);
+
+        // Calculate employer contributions, respecting the maximum contribution base
+        let employerContribution = Math.min(annualSalary, maxSGContributionBase) * sgRate;
+
+        // Total contributions for the year
+        const totalContributions = employerContribution + extraContributions;
+
+        // Apply investment return (compounding)
+        balance *= (1 + investmentReturn);
+        realBalance *= (1 + investmentReturn);
+
+        // Add contributions (usually at end of year or averaged, for simplicity, added after return)
+        balance += totalContributions;
+        realBalance += totalContributions;
+
+        // Adjust for inflation for 'real' balance
+        const inflationRate = getInflationRateForYear(yearIndex);
+        realBalance /= (1 + inflationRate); // Divide by inflation to get purchasing power
+
+        nominalBalances.push(balance);
+        realBalances.push(realBalance);
+    }
+
+    // 4. Display Results
+    document.getElementById('nominalBalance').textContent = formatCurrency(nominalBalances[nominalBalances.length - 1]);
+    document.getElementById('realBalance').textContent = formatCurrency(realBalances[realBalances.length - 1]);
+
+    // 5. Update Chart
+    if (superChart) {
+        superChart.destroy(); // Destroy previous chart instance
+    }
+
+    superChart = new Chart(superChartCanvas, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [{
+                label: 'Projected Nominal Balance (AUD)',
+                data: nominalBalances,
+                borderColor: '#007bff', // Blue
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                fill: true,
+                tension: 0.3
+            }, {
+                label: 'Projected Real (Inflation-Adjusted) Balance (AUD)',
+                data: realBalances,
+                borderColor: '#28a745', // Green
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Year'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Super Balance (AUD)'
+                    },
+                    beginAtZero: false,
+                    // Use a callback to format Y-axis labels as currency
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return formatCurrency(value);
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += formatCurrency(context.raw);
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // UX: Scroll to results section after calculation
+    document.querySelector('.results').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+}

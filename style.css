@@ -1,24 +1,19 @@
 body {
     font-family: Arial, sans-serif;
-    line-height: 1.6;
     margin: 0;
     padding: 20px;
-    background-color: #f4f4f4;
+    background-color: #f4f7f6;
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+    line-height: 1.6;
 }
 
 .container {
-    background: #fff;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ffffff;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    width: 100%;
-    margin-bottom: 50px; /* Space for chart */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 h1, h2, h3 {
@@ -34,85 +29,221 @@ p {
 
 .input-group {
     margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
+    color: #444;
 }
 
-.input-group input[type="number"] {
-    width: calc(100% - 22px); /* Account for padding and border */
+.input-group input[type="number"],
+.input-group select {
+    width: calc(100% - 20px); /* Adjust for padding */
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding in width */
 }
 
 .input-group small {
     display: block;
     margin-top: 5px;
-    color: #666;
+    color: #777;
     font-size: 0.85em;
 }
 
-button {
-    display: block;
-    width: 100%;
-    padding: 12px 20px;
-    background-color: #007bff;
+/* UX: Info Icon Styling */
+.info-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border: 1px solid #0056b3;
+    border-radius: 50%;
+    color: #0056b3;
+    font-size: 0.8em;
+    font-weight: bold;
+    cursor: help;
+    margin-left: 5px;
+}
+
+/* UX: Enhanced Button Styling */
+button#calculateBtn {
+    background-color: #4CAF50; /* A friendly green */
     color: white;
+    padding: 15px 30px;
     border: none;
-    border-radius: 4px;
-    font-size: 18px;
+    border-radius: 8px; /* Slightly more rounded */
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* Smooth hover */
+    margin: 20px auto; /* Center button and add vertical space */
+    display: block; /* Make it a block element to center with margin: auto */
+    width: fit-content; /* Shrink to content width */
 }
 
-button:hover {
-    background-color: #0056b3;
+button#calculateBtn:hover {
+    background-color: #45a049;
 }
 
+/* UX: Emphasize Results Section */
 .results {
+    background-color: #e9f5ff; /* Light blue background */
+    border-left: 5px solid #0056b3; /* Blue left border */
+    padding: 20px;
     margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    border-radius: 5px;
+    text-align: center;
 }
 
-.results h2, .results h3 {
-    text-align: left;
-    color: #333;
+.results h2 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.results h3 {
+    margin: 10px 0;
 }
 
 .results h3 span {
-    color: #28a745; /* Green for positive values */
-    font-size: 1.2em;
+    font-size: 1.8em; /* Larger text for balances */
+    color: #0056b3; /* A prominent color, e.g., deep blue */
     font-weight: bold;
+    display: block; /* Ensures it takes its own line if needed */
+    margin-top: 5px; /* Space below label */
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 600px; /* Limit chart width */
+    margin: 20px auto;
 }
 
 .disclaimer {
     font-size: 0.8em;
-    color: #777;
-    border-top: 1px dashed #eee;
-    padding-top: 15px;
-    margin-top: 25px;
-}
-
-.chart-container {
-    position: relative;
-    height: 400px; /* Adjust height as needed */
-    width: 100%;
+    color: #666;
     margin-top: 30px;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    border-left: 3px solid #ccc;
+    text-align: justify;
 }
 
-/* Basic responsiveness */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
+/* SEO: FAQ Section Styling */
+.faq-section {
+    margin-top: 40px;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+
+.faq-section h2 {
+    font-size: 1.6em;
+    margin-bottom: 25px;
+    color: #0056b3;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden; /* For collapsible effect */
+}
+
+/* UX: Collapsible FAQ Question */
+.faq-question {
+    cursor: pointer;
+    padding: 15px 20px;
+    background-color: #f8f8f8;
+    color: #333;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faq-question:hover {
+    background-color: #f0f0f0;
+}
+
+/* Optional: Add an arrow indicator for FAQ */
+.faq-question::after {
+    content: '+';
+    font-size: 1.2em;
+    margin-left: 10px;
+    transition: transform 0.3s ease;
+}
+
+.faq-question.active::after {
+    content: '-';
+    transform: rotate(180deg); /* Rotate for minus sign */
+}
+
+/* UX: Collapsible FAQ Answer */
+.faq-answer {
+    padding: 0 20px; /* Initial padding, vertical padding set by JS */
+    max-height: 0; /* Initially hidden */
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+    background-color: #ffffff;
+    color: #555;
+    text-align: justify;
+}
+
+.faq-answer.show {
+    max-height: 500px; /* Adjust as needed, sufficiently large to show content */
+    padding: 15px 20px;
+}
+
+
+/* Ad Slot Styling */
+.ad-slot {
+    width: 100%; /* Default to full width for responsiveness */
+    text-align: center;
+    margin: 20px auto; /* Center ads and provide vertical space */
+    min-height: 90px; /* A common height for leaderboards */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7f7f7; /* Light grey placeholder */
+    border: 1px dashed #ddd; /* Dotted border for visibility */
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.ad-slot p {
+    margin: 0; /* Remove default paragraph margin */
+}
+
+.top-banner {
+    margin-top: 0; /* No margin at the very top */
+    padding: 10px 0;
+}
+
+.footer-banner {
+    margin-bottom: 0; /* No margin at the very bottom */
+    padding: 10px 0;
+}
+
+/* Responsive adjustments for ads */
+@media (max-width: 768px) {
+    .ad-slot {
+        min-height: 50px; /* Smaller height for mobile banners (e.g., 320x50) */
     }
-    .container {
-        padding: 20px;
+    .mid-content-ad {
+        /* On smaller screens, 300x250 might still fit, or let AdSense auto-size */
+    }
+    .top-banner, .footer-banner {
+        /* No specific changes here for mobile, let min-height handle it */
     }
 }
